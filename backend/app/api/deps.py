@@ -1,18 +1,15 @@
 from typing import Generator, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
+from jose import jwt, JWTError
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
-
+from app import crud, models, schemas
+from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
-from app.models.user import User
-from app.schemas.token import TokenPayload
 
-reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
-)
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/login")
 
 def get_db() -> Generator:
     try:
@@ -23,39 +20,42 @@ def get_db() -> Generator:
 
 def get_current_user(
     db: Session = Depends(get_db),
-    token: str = Depends(reusable_oauth2),
-) -> User:
+    token: str = Depends(reusable_oauth2)
+) -> models.User:
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
-        token_data = TokenPayload(**payload)
-    except (jwt.JWTError, ValidationError):
+        token_data = schemas.TokenPayload(**payload)
+    except (JWTError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = db.query(User).filter(User.id == token_data.sub).first()
+    user = crud.user.get_user(db, user_id=token_data.sub)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
+        raise HTTPException(status_code=404, detail="User not found")
     return user
 
 def get_current_active_user(
-    current_user: User = Depends(get_current_user),
-) -> User:
+    current_user: models.User = Depends(get_current_user),
+) -> models.User:
     if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+def get_current_active_superuser(
+    current_user: models.User = Depends(get_current_user),
+) -> models.User:
+    if not current_user.is_superuser:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user",
+            status_code=400, detail="The user doesn't have enough privileges"
         )
     return current_user
 
 async def get_current_teacher(
-    current_user: User = Depends(get_current_active_user),
-) -> User:
+    current_user: models.User = Depends(get_current_active_user),
+) -> models.User:
     """
     Get current teacher profile.
     Verifies user has teacher role and returns teacher profile.
@@ -76,8 +76,8 @@ async def get_current_teacher(
     return current_user
 
 async def get_current_student(
-    current_user: User = Depends(get_current_active_user),
-) -> User:
+    current_user: models.User = Depends(get_current_active_user),
+) -> models.User:
     """
     Get current student profile.
     Verifies user has student role and returns student profile.
@@ -98,8 +98,8 @@ async def get_current_student(
     return current_user
 
 async def get_current_principal(
-    current_user: User = Depends(get_current_active_user),
-) -> User:
+    current_user: models.User = Depends(get_current_active_user),
+) -> models.User:
     """
     Get current principal profile.
     Verifies user has principal role and returns principal profile.
@@ -120,8 +120,8 @@ async def get_current_principal(
     return current_user
 
 async def get_current_developer(
-    current_user: User = Depends(get_current_active_user),
-) -> User:
+    current_user: models.User = Depends(get_current_active_user),
+) -> models.User:
     """
     Get current developer profile.
     Verifies user has developer role and returns developer profile.

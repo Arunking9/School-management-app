@@ -1,35 +1,28 @@
-from typing import Any, Dict, List, Optional, Union
-from pydantic import AnyHttpUrl, EmailStr, HttpUrl, field_validator, computed_field
-from pydantic_settings import BaseSettings, SettingsConfigDict
-import secrets
-from pathlib import Path
+from typing import List
+from pydantic import BaseModel
+import os
+from dotenv import load_dotenv
 
-class Settings(BaseSettings):
-    API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
-    SERVER_NAME: str = "School Management System"
-    SERVER_HOST: AnyHttpUrl = "http://localhost:8000"
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+load_dotenv()
 
-    @field_validator("BACKEND_CORS_ORIGINS", mode='before')
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
-
+class Settings(BaseModel):
     PROJECT_NAME: str = "School Management System"
+    API_V1_STR: str = "/api/v1"
     
-    @computed_field
-    @property
-    def SQLALCHEMY_DATABASE_URI(self) -> str:
-        return "sqlite:///./school_management.db"
-
-    FIRST_SUPERUSER: EmailStr = "admin@school.com"
-    FIRST_SUPERUSER_PASSWORD: str = "admin123"
-
-    model_config = SettingsConfigDict(case_sensitive=True, env_file=".env", extra='allow')
+    # Security
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-super-secret-key-change-this-in-production")
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    
+    # CORS
+    BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",  # React frontend
+        "http://localhost:8000",  # FastAPI backend
+    ]
+    
+    # Database
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL", "sqlite:///./school_management.db"
+    )
 
 settings = Settings() 

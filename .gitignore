@@ -12,6 +12,7 @@ node_modules/
 
 # Misc
 .DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -48,3 +49,17 @@ nosetests.xml
 coverage.xml
 *.cover
 *.log
+
+# Database
+*.db
+*.sqlite3
+
+# Uploads
+uploads/
+
+# Cloudflare
+.cloudflared/
+config.yml
+
+# Local development
+start_tunnel.bat

@@ -1,14 +1,23 @@
-from app.models.base_model import *
-from app.models.enums import UserRole
+from sqlalchemy import Boolean, Column, Integer, String, Enum
+from sqlalchemy.orm import relationship
+import enum
+from app.db.base_class import Base
 from app.core.security import verify_password
+
+class UserRole(str, enum.Enum):
+    STUDENT = "student"
+    TEACHER = "teacher"
+    PRINCIPAL = "principal"
+    DEVELOPER = "developer"
 
 class User(Base):
     __tablename__ = "users"
 
+    id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    full_name = Column(String, nullable=False)
-    role = Column(Enum(UserRole), nullable=False)
+    full_name = Column(String)
+    role = Column(Enum(UserRole), default=UserRole.STUDENT)
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
 
