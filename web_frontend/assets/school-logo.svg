@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Shield background -->
+    <path d="M20 2L4 8V20C4 30 20 38 20 38C20 38 36 30 36 20V8L20 2Z" fill="#0D47A1"/>
+    
+    <!-- Book icon -->
+    <path d="M14 14V26H26V14H14ZM24 24H16V16H24V24Z" fill="white"/>
+    <path d="M20 17L23 20L20 23L17 20L20 17Z" fill="white"/>
+</svg> 

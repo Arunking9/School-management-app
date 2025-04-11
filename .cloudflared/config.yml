@@ -1,0 +1,10 @@
+tunnel: school-management
+credentials-file: .cloudflared/credentials.json
+originCertPath: .cloudflared/cert.pem
+ingress:
+  - service: http://localhost:8080
+  - service: http_status:404
+
+# API Configuration
+api:
+  token: JMsc21wGrtWEul8QxDeOZxk2n1pXz7zsVZIhEODy 

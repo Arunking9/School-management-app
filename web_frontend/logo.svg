@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Circle -->
+    <circle cx="100" cy="100" r="90" fill="#2563eb" opacity="0.1"/>
+    
+    <!-- Book Icon -->
+    <path d="M60 60h80v80H60V60z" fill="#2563eb"/>
+    <path d="M60 60h80v20H60V60z" fill="#1e40af"/>
+    
+    <!-- Pages -->
+    <path d="M70 90h60v40H70V90z" fill="white"/>
+    <path d="M70 90h60v10H70V90z" fill="#e2e8f0"/>
+    <path d="M70 110h60v10H70V110z" fill="#e2e8f0"/>
+    <path d="M70 130h60v10H70V130z" fill="#e2e8f0"/>
+    
+    <!-- Decorative Elements -->
+    <circle cx="100" cy="100" r="5" fill="#3b82f6"/>
+    <circle cx="100" cy="100" r="3" fill="white"/>
+</svg> 
